@@ -1,3 +1,11 @@
+# Sample STS Applications
+
+Sample project to help get started with the STS API. This contains code to demonstrate some basic use cases.
+
+API specification is found here: `https://app.swaggerhub.com/apis/longshot/STS/2.0.0`
+
+For more information contact Longshot Systems.
+
 ## Java
 
 * Run `make` in `/java`
