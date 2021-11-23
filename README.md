@@ -13,7 +13,7 @@ There is a class containing a sample application: `uk.co.longshotsystems.sts.Sam
 
 1. API username
 2. API password
-3. API root url (eg: `sharpbet.dev.sportstradingservices.com/longshot/STS/2.0.0/`)
+3. API root url (eg: `api.example.com/longshot/STS/2.0.0/`)
 
 This application will:
 
