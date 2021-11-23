@@ -54,7 +54,7 @@ public class SampleApp {
                 // TODO: publish data
 
                 msgCount++;
-                if (msgCount == 5) {
+                if (msgCount == 10) {
                     placeBetOnEvent(api, pickEvent(dataStore));
                 }
             }
