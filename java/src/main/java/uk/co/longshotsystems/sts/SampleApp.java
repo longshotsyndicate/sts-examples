@@ -12,12 +12,21 @@ import java.util.UUID;
  * This small sample application connects to the websocket and stores all of the data it receives.
  * It also picks a random event and market and places a single bet on it, handling the pending situation
  * if required.
+ *
+ * Three command line arguments are required:
+ * - Username
+ * - Password
+ * - API root url (eg: "sharpbet.dev.sportstradingservices.com/longshot/STS/2.0.0/")
  */
 public class SampleApp {
     public static void main(String[] args) {
         try {
             start(args[0], args[1], args[2]);
-        } catch (Exception e) {
+        } catch (API.APIError e) {
+            // These API errors need to be handled appropriately. See the API documentation for a detailed description
+            // off all API errors that might occur for each API call.
+            System.out.println("Got API error: " + e.error);
+        }  catch (Exception e) {
             System.out.println(e);
         }
     }
@@ -34,17 +43,19 @@ public class SampleApp {
 
         // Open the websocket and cache the data
         api.odds(new API.SocketCallback() {
-            boolean hasPlacedBet = false;
+            int msgCount = 0;
 
             @Override
             public void onMessage(WSMessage m) {
+                System.out.println("Received message on socket");
+
                 storeData(dataStore, m);
 
                 // TODO: publish data
 
-                if (!hasPlacedBet) {
-                    hasPlacedBet = true;
-                    placeBet(api, dataStore);
+                msgCount++;
+                if (msgCount == 5) {
+                    placeBetOnEvent(api, pickEvent(dataStore));
                 }
             }
 
@@ -55,13 +66,32 @@ public class SampleApp {
         }, token);
     }
 
-    private static void placeBet(API api, Map<Long, Update> dataStore) {
+    private static Update pickEvent(Map<Long, Update> dataStore) {
+        // Prefer an inplay event with prices
         for (var event : dataStore.values()) {
-            if (event.getPrices().size() > 0) {
-                placeBetOnEvent(api, event);
-                break;
+            if (isInplay(event) && event.getPrices().size() > 0) {
+                return event;
             }
         }
+
+        // otherwise anything with prices
+        for (var event : dataStore.values()) {
+            if (event.getPrices().size() > 0) {
+                return event;
+            }
+        }
+
+        return null;
+    }
+
+    private static boolean isInplay(Update event) {
+        LiveData ld = event.getLive();
+        if (ld == null) {
+            return false;
+        }
+
+        GameTime.PeriodEnum p = ld.getGameTime().getPeriod();
+        return p == GameTime.PeriodEnum.FIRST_HALF || p == GameTime.PeriodEnum.SECOND_HALF;
     }
 
     /**
@@ -70,6 +100,14 @@ public class SampleApp {
      * @param event
      */
     private static void placeBetOnEvent(API api, Update event) {
+        if (event == null) {
+            System.out.println("cannot find suitable event to bet on");
+            return;
+        }
+
+        System.out.println("Placing bet on " + event.getEventDescription().getHome() + " v " + event.getEventDescription().getAway() + " " + event.getPrices().size());
+        printPrices(event);
+
         try {
             Odds odds = event.getPrices().get(0);
 
@@ -105,9 +143,21 @@ public class SampleApp {
                 handlePending(api, betId, resp);
             }
         } catch (API.APIError e) {
-            System.out.println(e.error);
+            // These API errors need to be handled appropriately. See the API documentation for a detailed description
+            // off all API errors that might occur for each API call.
+            System.out.println("Got API error: " + e.error);
         } catch (Exception e) {
             System.out.println(e);
+        }
+    }
+
+    private static void printPrices(Update event) {
+        for (var pr : event.getPrices()) {
+            String betType = String.join(",", pr.getBetType());
+            var back = pr.getBack() != null ? pr.getBack().getPrice() : 0;
+            var lay = pr.getLay() != null ? pr.getLay().getPrice() : 0;
+
+            System.out.printf("\n\t%-15s -> Back: %f\tLay: %f", betType, back, lay);
         }
     }
 

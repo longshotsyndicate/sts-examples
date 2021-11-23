@@ -18,6 +18,9 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Date;
 
+/**
+ * Contains some JSON parsing logic required by GSON to work with Swagger-Codegen classes.
+ */
 public class JSON {
     public static Gson createGson() {
         GsonBuilder builder = new GsonFireBuilder().createGsonBuilder();
