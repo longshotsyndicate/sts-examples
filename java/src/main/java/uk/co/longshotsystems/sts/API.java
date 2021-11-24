@@ -28,6 +28,15 @@ public class API {
         return doPost("auth", req, AuthResponse.class);
     }
 
+    /**
+     * Defines a callback which is triggered every time a new websocket message is received or when
+     * the connection is closed.
+     */
+    public interface SocketCallback {
+        void onMessage(WSMessage m);
+        void onClosed();
+    }
+
     private final String url;
     private final HttpClient client;
     private final Gson gson;
@@ -36,6 +45,19 @@ public class API {
         url = u;
         client = HttpClientBuilder.create().build();
         gson = JSON.createGson();
+    }
+
+    /**
+     * A exception to handle the case where an error type was returned by the API.
+     */
+    public static class APIError extends Exception {
+        public int code;
+        public ErrorResponse error;
+
+        public APIError(int c, ErrorResponse e) {
+            code = c;
+            error = e;
+        }
     }
 
     public BetAdviceResponse advice(BetAdviceRequest req) throws Exception {
@@ -113,11 +135,6 @@ public class API {
         return gson.fromJson(result, clazz);
     }
 
-    public interface SocketCallback {
-        void onMessage(WSMessage m);
-        void onClosed();
-    }
-
     private void sendHb(WebSocket ws, int id) {
         WSMessage msg = new WSMessage();
         Heartbeat hb = new Heartbeat();
@@ -125,18 +142,5 @@ public class API {
         msg.setHeartbeat(hb);
 
         ws.sendText(gson.toJson(msg));
-    }
-
-    /**
-     * A exception to handle the case where an error type was returned by the API.
-     */
-    public static class APIError extends Exception {
-        public int code;
-        public ErrorResponse error;
-
-        public APIError(int c, ErrorResponse e) {
-            code = c;
-            error = e;
-        }
     }
 }
