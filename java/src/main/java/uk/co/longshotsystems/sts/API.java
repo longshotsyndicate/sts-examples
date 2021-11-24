@@ -115,7 +115,6 @@ public class API {
 
     public interface SocketCallback {
         void onMessage(WSMessage m);
-
         void onClosed();
     }
 
@@ -128,6 +127,9 @@ public class API {
         ws.sendText(gson.toJson(msg));
     }
 
+    /**
+     * A exception to handle the case where an error type was returned by the API.
+     */
     public static class APIError extends Exception {
         public int code;
         public ErrorResponse error;
