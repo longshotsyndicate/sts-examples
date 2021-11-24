@@ -29,5 +29,5 @@ This application will:
 * manage heartbeating
 * connect to the websocket
 * store any data received
-* pick a random event (preferring an inplay game) and bet on it
-* handle the lifecycle of this bet
+* pick a random event (preferring an inplay game) and request trading advice for it
+* handle the lifecycle of this advice
