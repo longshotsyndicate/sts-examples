@@ -25,7 +25,7 @@ public class SampleApp {
         } catch (API.APIError e) {
             // These API errors need to be handled appropriately. See the API documentation for a detailed description
             // off all API errors that might occur for each API call.
-            System.out.println("Got API error: " + e.error);
+            System.out.printf("\nGot API error: %d - %s", e.code, e.error);
         }  catch (Exception e) {
             System.out.println(e);
         }

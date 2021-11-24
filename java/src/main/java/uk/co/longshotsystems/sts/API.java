@@ -104,9 +104,10 @@ public class API {
         HttpEntity entity = response.getEntity();
         String result = EntityUtils.toString(entity);
 
-        if (response.getStatusLine().getStatusCode() != 200) {
+        var code = response.getStatusLine().getStatusCode();
+        if (code != 200) {
             ErrorResponse err = gson.fromJson(result, ErrorResponse.class);
-            throw new APIError(err);
+            throw new APIError(code, err);
         }
 
         return gson.fromJson(result, clazz);
@@ -128,9 +129,11 @@ public class API {
     }
 
     public static class APIError extends Exception {
+        public int code;
         public ErrorResponse error;
 
-        public APIError(ErrorResponse e) {
+        public APIError(int c, ErrorResponse e) {
+            code = c;
             error = e;
         }
     }
