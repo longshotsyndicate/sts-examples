@@ -8,6 +8,8 @@ For more information contact Longshot Systems.
 
 ## Java
 
+### Build
+
 * Run `make` in `/java`
 
 This will:
@@ -16,6 +18,8 @@ This will:
 - download the appropriate version of Gradle
 - download any Java dependencies
 - build the project
+
+### Sample Application
 
 There is a class containing a sample application: `uk.co.longshotsystems.sts.SampleApp`. It takes 3 command line arguments:
 
@@ -31,3 +35,9 @@ This application will:
 * store any data received
 * pick a random event (preferring an inplay game) and request trading advice for it
 * handle the lifecycle of this advice
+
+### Running
+
+Example:
+
+`java -jar build/libs/java.jar my_username my_password api.example.com/longshot/STS/2.0.0/`
